@@ -1,23 +1,20 @@
-import axios from "axios";
-
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
-//Components
+// Components
 import LoginForm from "./components/LoginForm";
 import CreateForm from "./components/CreateForm";
 import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
+import Users from "./components/Users";
 
 const App = () => {
     const baseUrl = "http://localhost:3003/api/blogs";
-    // List of blogs of the user
     const [blogs, setBlogs] = useState([]);
-    // The user state for the login
     const [user, setUser] = useState(null);
-    // States for notification handling
     const [successMsg, setSuccessMsg] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
 
@@ -29,7 +26,6 @@ const App = () => {
 
     useEffect(() => {
         blogService.getAll().then((blogs) => {
-            // Descending order by likes
             const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
             setBlogs(sortedBlogs);
         });
@@ -43,7 +39,6 @@ const App = () => {
         }
     }, []);
 
-    // Updating the likes of a blog entry
     const updateBlogOnServer = (id, updatedBlog) => {
         return axios
             .put(`${baseUrl}/${id}/likes`, { likes: updatedBlog.likes })
@@ -54,13 +49,12 @@ const App = () => {
             });
     };
 
-    // Removing a blog entry
     const deleteBlogOnServer = (id) => {
         return axios
             .delete(`${baseUrl}/${id}`)
             .then((res) => res.data)
             .catch((error) => {
-                console.error("");
+                console.error("Error deleting blog:", error);
                 throw error;
             });
     };
@@ -75,53 +69,55 @@ const App = () => {
         }
     };
 
-    // Manage the logout process
     const handleLogout = () => {
         window.localStorage.removeItem("loggedUser");
         setUser(null);
         refreshBlogs();
     };
 
-    // Refresh the list of blogs
     const refreshBlogs = async () => {
         const blogs = await blogService.getAll();
-        // Descending order by likes
         const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
         setBlogs(sortedBlogs);
     };
 
     return (
-        <div>
-            <h2>blog list frontend</h2>
-            {successMsg && <Notification msg={successMsg} type="success" />}
-            {errorMsg && <Notification msg={errorMsg} type="error" />}
-            {!user && <LoginForm onLogin={handleLogin} setErrorMsg={setErrorMsg} />}
+        <Router>
+            <div>
+                <h2>Blog list frontend</h2>
+                {successMsg && <Notification msg={successMsg} type="success" />}
+                {errorMsg && <Notification msg={errorMsg} type="error" />}
 
-            {user ? (
-                <div>
-                    <div style={loggedStyle}>
-                        <p style={{ fontWeight: "bold" }}>{user.name} logged in</p>
-                        <button onClick={handleLogout}>logout</button>
-                    </div>
-                    <Togglable buttonLabel="new blog">
-                        <CreateForm user={user} setSuccessMsg={setSuccessMsg} setErrorMsg={setErrorMsg} onBlogCreate={refreshBlogs} />
-                    </Togglable>
-                    <br />
-                    {blogs.map((blog) => (
-                        <Blog
-                            key={blog.id}
-                            blog={blog}
-                            updateBlogOnServer={updateBlogOnServer}
-                            deleteBlogOnServer={deleteBlogOnServer}
-                            refreshBlogs={refreshBlogs}
-                            currentUser={user} // Asegúrate de pasar el usuario logueado
-                        />
-                    ))}
-                </div>
-            ) : (
-                <p>Please log in to view blogs</p>
-            )}
-        </div>
+                <Routes>
+                    {/* Ruta para el listado de blogs (componente actual) */}
+                    <Route
+                        path="/"
+                        element={
+                            !user ? (
+                                <LoginForm onLogin={handleLogin} setErrorMsg={setErrorMsg} />
+                            ) : (
+                                <div>
+                                    <div style={loggedStyle}>
+                                        <p style={{ fontWeight: "bold" }}>{user.name} logged in</p>
+                                        <button onClick={handleLogout}>logout</button>
+                                    </div>
+                                    <Togglable buttonLabel="new blog">
+                                        <CreateForm user={user} setSuccessMsg={setSuccessMsg} setErrorMsg={setErrorMsg} onBlogCreate={refreshBlogs} />
+                                    </Togglable>
+                                    <br />
+                                    {blogs.map((blog) => (
+                                        <Blog key={blog.id} blog={blog} updateBlogOnServer={updateBlogOnServer} deleteBlogOnServer={deleteBlogOnServer} refreshBlogs={refreshBlogs} currentUser={user} />
+                                    ))}
+                                </div>
+                            )
+                        }
+                    />
+
+                    {/* Ruta para el componente Users */}
+                    <Route path="/users" element={<Users />} />
+                </Routes>
+            </div>
+        </Router>
     );
 };
 
