@@ -10,6 +10,7 @@ import CreateForm from "./components/CreateForm";
 import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import Users from "./components/Users";
+import UserPosts from "./components/UserPosts";
 
 const App = () => {
     const baseUrl = "http://localhost:3003/api/blogs";
@@ -89,7 +90,6 @@ const App = () => {
                 {errorMsg && <Notification msg={errorMsg} type="error" />}
 
                 <Routes>
-                    {/* Ruta para el listado de blogs (componente actual) */}
                     <Route
                         path="/"
                         element={
@@ -113,8 +113,8 @@ const App = () => {
                         }
                     />
 
-                    {/* Ruta para el componente Users */}
                     <Route path="/users" element={<Users />} />
+                    <Route path="/users/:id" element={<UserPosts />} />
                 </Routes>
             </div>
         </Router>
