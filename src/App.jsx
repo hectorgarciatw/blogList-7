@@ -11,6 +11,7 @@ import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import Users from "./components/Users";
 import UserPosts from "./components/UserPosts";
+import BlogDetail from "./components/BlogDetail";
 
 const App = () => {
     const baseUrl = "http://localhost:3003/api/blogs";
@@ -112,7 +113,7 @@ const App = () => {
                             )
                         }
                     />
-
+                    <Route path="/blogs/:id" element={<BlogDetail />} />
                     <Route path="/users" element={<Users />} />
                     <Route path="/users/:id" element={<UserPosts />} />
                 </Routes>

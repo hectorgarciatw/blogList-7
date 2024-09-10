@@ -14,4 +14,9 @@ const create = (newBlog, token) => {
     return request.then((response) => response.data);
 };
 
-export default { getAll, create };
+const getBlogById = async (id) => {
+    const response = await axios.get(`${baseUrl}/${id}`);
+    return response.data;
+};
+
+export default { getAll, create, getBlogById };
