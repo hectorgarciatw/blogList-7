@@ -19,4 +19,10 @@ const getBlogById = async (id) => {
     return response.data;
 };
 
-export default { getAll, create, getBlogById };
+//Adding a comment to a blog
+const addComment = async (id, comment) => {
+    const response = await axios.post(`${baseUrl}/${id}/comments`, { comment });
+    return response.data;
+};
+
+export default { getAll, create, getBlogById, addComment };

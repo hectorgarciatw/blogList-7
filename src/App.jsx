@@ -12,6 +12,7 @@ import Togglable from "./components/Togglable";
 import Users from "./components/Users";
 import UserPosts from "./components/UserPosts";
 import BlogDetail from "./components/BlogDetail";
+import Navbar from "./components/NavBar";
 
 const App = () => {
     const baseUrl = "http://localhost:3003/api/blogs";
@@ -89,7 +90,7 @@ const App = () => {
                 <h2>Blog list frontend</h2>
                 {successMsg && <Notification msg={successMsg} type="success" />}
                 {errorMsg && <Notification msg={errorMsg} type="error" />}
-
+                {user && <Navbar user={user} handleLogout={handleLogout} />}
                 <Routes>
                     <Route
                         path="/"
